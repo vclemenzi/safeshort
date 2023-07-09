@@ -1,0 +1,2 @@
+# SafeShort
+SafeShort is a url shorter platform that does not allow publishing sites within the file-db of malicious sites. This control unfortunately leads to the url creation being a little slower in comparison to other url shorteners but at least you can feel safer when clicking on a url shortened. The initial design was inspired by [this](https://www.youtube.com/watch?v=ElQxbbNBayI) youtube short made by [NetworkChuck](https://www.youtube.com/@NetworkChuck). SafeHost can be self-hosted and started by itself to have its own secure url shorter.

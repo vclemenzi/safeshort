@@ -33,7 +33,7 @@ func Short(c *gin.Context, rdb *redis.Client, ctx context.Context) {
     isMalicius := utils.CheckURL(data.Url)
 
     if isMalicius {
-        c.JSON(200, gin.H{
+        c.JSON(452, gin.H{
 		    "status": 452,
             "message": "Blocked for security reasons: This url has been blocked as dangerous",
 	    })

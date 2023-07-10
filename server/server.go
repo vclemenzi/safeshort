@@ -2,6 +2,7 @@ package server
 
 import (
 	"os"
+    "context"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -9,6 +10,7 @@ import (
 )
 
 func Server() {
+    ctx := context.Background()
     r := gin.Default()
     rdb := redis.NewClient(&redis.Options{
         Addr:     os.Getenv("REDIS_URL"),
@@ -16,9 +18,9 @@ func Server() {
         DB:       0,
     })
 
-    r.GET("/:id", func (c *gin.Context) { routes.Redirect(c, rdb) })
+    r.GET("/:id", func (c *gin.Context) { routes.Redirect(c, rdb, ctx) })
     
-    r.POST("/api/short", func (c *gin.Context) { routes.Redirect(c, rdb) })
+    r.POST("/api/short", func (c *gin.Context) { routes.Short(c, rdb, ctx) })
 
     r.Run()
 }

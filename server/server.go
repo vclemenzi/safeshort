@@ -18,8 +18,10 @@ func Server() {
         DB:       0,
     })
 
+    r.StaticFile("/", "./public/index.html")
+
     r.GET("/:id", func (c *gin.Context) { routes.Redirect(c, rdb, ctx) })
-    
+
     r.POST("/api/short", func (c *gin.Context) { routes.Short(c, rdb, ctx) })
 
     r.Run()

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<head>
+    <title>Short your url!</title>
+    <style>
+        * {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #abaad0;
+            transition: background 1s ease;
+        }
+
+        .main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 95vh;
+        }
+
+        .box {
+            width: 100%;
+            text-align: center;
+        }
+
+        .short {
+            padding: 0.8rem;
+            margin-top: 5px;
+            width: 72.5%;
+            border-radius: 8px;
+            font-size: large;
+            border: 3px solid #5268ff;
+            background-color: #5268ff;
+            color: #e5e6de;
+            transition: opacity 1s ease;
+        }
+
+        .short:hover {
+            cursor: pointer;
+        }
+
+        .input {
+            padding: 1rem;
+            width: 70%;
+            border-radius: 8px;
+            border: 1.5px solid gray;
+            font-size: large;
+        }
+
+        .input:hover {
+            cursor: pointer;
+        }
+
+        .input:focus {
+            outline: none;
+        }
+
+        .alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 1rem;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        .alert.show {
+            display: block;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .alert.hide {
+            animation: fadeOut 0.3s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        #success-alert {
+            text-align: center;
+        }
+
+        #success-alert-close, #error-alert-close {
+            padding: 0.5rem;
+            margin-top: 5px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: large;
+            border: 3px solid #e33030;
+            background-color: #e33030;
+            color: #e5e6de;
+            transition: opacity 1s ease;
+            cursor: pointer;
+        }
+
+        .full {
+            width: 91%;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="success-alert" class="alert">
+        <h2>Link successfully shortened!</h1>
+        <input value="" class="input full" readonly="true" />         
+        <button id="success-alert-close" onclick="closeSuccessAlert()">Close</button>
+    </div>
+
+
+    <div id="error-alert" class="alert">
+        <h2>👮 Oops, this link doesn't seem to be secure!</h2>
+        <p>
+            It looks like this link is not secure, check it again! 
+            If, on the other hand your intention was to shorten a malicious link 
+            I'm sorry, you got caught! 😜
+        </p>
+        <button id="error-alert-close" onclick="closeErrorAlert()">Close</button>
+    </div>
+
+    <div class="main">
+        <div class="box">
+            <input class="input" id="url" name="url"  placeholder="https://example.com/" />
+            <br>
+            <button onclick="short()" class="short">Short Now</button>
+        </div>
+    </div>
+
+    <script>
+        const colors = ["#8dc4e1", "#efdf8d", "#eca9a2", "#663a00", "#404d00", "#abaad0"];
+        let currentColor = 0;
+
+        setInterval(() => {
+            const body = document.querySelector("body");
+
+            if (currentColor >= 6) currentColor = 1;
+            else currentColor += 1;
+
+            body.style.backgroundColor = colors[currentColor];
+        }, 8000)
+
+        function short() {
+            const button = document.querySelector("button");
+            const val = document.querySelector("#url").value;
+
+            if (val == "") {
+                return;
+            }
+
+            // Loading style
+            button.innerText = "Shortening of the link in progress";
+            button.style.opacity = 0.5;
+            button.style.cursor = "not-allowed";
+
+            fetch("/api/short", {
+                method: "POST",
+                 headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    url: val
+                })
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.status == 200) {
+                        button.innerText = "Short Now";
+                        button.style.opacity = 1;
+                        button.style.cursor = "pointer";
+
+                        showSuccessAlert(data.url);
+                    } else if (data.status == 452) {
+                        button.innerText = "Short Now";
+                        button.style.opacity = 1;
+                        button.style.cursor = "pointer";
+
+                        showErrorAlert();
+                    }
+                });
+        }
+
+        function showSuccessAlert(url) {
+            const alertElement = document.getElementById("success-alert");
+            
+            document.querySelector("input").value = url;
+
+            alertElement.classList.add("show");
+        }
+
+        function closeSuccessAlert() {
+            const alertElement = document.getElementById("success-alert");
+            alertElement.classList.remove("show");
+            alertElement.classList.add("hide");
+
+            setTimeout(function () {
+                alertElement.classList.remove("hide");
+            }, 300);
+        }
+
+        function showErrorAlert() {
+            const alertElement = document.getElementById("error-alert");
+            alertElement.classList.add("show");
+        }
+
+        function closeErrorAlert() {
+            const alertElement = document.getElementById("error-alert");
+            alertElement.classList.remove("show");
+            alertElement.classList.add("hide");
+
+            setTimeout(function () {
+                alertElement.classList.remove("hide");
+            }, 300);
+        }
+    </script>
+</body>
